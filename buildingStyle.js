@@ -35,24 +35,70 @@ function getColorByPopulation(population){
     return null
 }
 
+function getStyleByPopulation(population){
+    var fillColor = getColorByPopulation(population);
+    var strokeColor = "black";
+    var strokeWidth = 1.2;
+    var text = population.toString();
+    var textFont = "bold 10px serif";
+
+    const style = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: fillColor,
+        }),
+        stroke: new ol.style.Stroke({
+            color: strokeColor,
+            width: strokeWidth
+        }),
+        text: new ol.style.Text({
+            text: text,
+            font: textFont
+        })
+    });
+    return style
+}
+
 function drawShapesOnMap(path, map){
     fetch(path)
     .then(response => response.json())
     .then(data => {
-        for(var i=0; i < data.features.length; i++){
-            var population = data.features[i].properties.Population;
-            var color = getColorByPopulation(population)
+        const format = new ol.format.GeoJSON();
+        const features = format.readFeatures(data)
 
-            var vectorSource = new ol.source.Vector({
-                features: new ol.format.GeoJSON().readFeatures(data.features[i])
-            });
+        let vectorSource = new ol.source.Vector();
+        let style, population;
 
-            const vectorLayer = new ol.layer.Vector({
-                source: vectorSource
-            });
+        features.forEach((feature, index) => {
+            population = feature.getProperties().Population;
+            style = getStyleByPopulation(population);
 
-            map.addLayer(vectorLayer);
-        }
+            feature.setStyle(style);
+            vectorSource.addFeatures([feature]);
+            let allFeatures = vectorSource.getFeatures();
+            allFeatures.forEach((f, i) => {
+                console.log("Index: ",index+"."+i,"\nPopulation: ",f.getProperties().Population ,"\nColor: ",f.getStyle().getFill().getColor())        
+            })
+        });
+        
+        let vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+            opacity: 0.8,
+            visible: true,
+            zIndex: 2,
+            title: "VectorLayer"
+        });
+
+        let f = vectorLayer.getSource().getFeatures();
+        f.forEach((a, b) => {
+            console.log(a.getProperties());
+        })
+
+        map.addLayer(vectorLayer);
+    
+        var layers = map.getLayers();
+            layers.forEach(function(layer) {
+            console.log("DSOM) ",layer.get('title'));
+        });
     })
     .catch(error => console.error('Error:', error));
 }

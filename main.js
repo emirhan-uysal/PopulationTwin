@@ -6,27 +6,37 @@ function init(){
             zoom: 17,
             maxZoom: 20
         }),
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            })
-        ],
         target: 'js-map'
     })
+
+    const standartLayer = new ol.layer.Tile({
+        source: new ol.source.OSM(),
+        visible: true,
+        zIndex: 1,
+        title: "StandartLayer"
+    })
+
+    map.addLayer(standartLayer)
 
     map.on('click',function(e){
         console.log(e.coordinate)
     })
 
-    //Adding Vector Layers
+    let style = getStyleByPopulation(1999)
     const buildingsGeoJSON = new ol.layer.VectorImage({
         source: new ol.source.Vector({
             url: './data/map.geojson',
             format: new ol.format.GeoJSON()
         }),
+        opacity: 0.8,
+        style: style,
         visible: true,
-        title: 'buildingsGeoJSON'
+        title: 'buildingsGeoJSON',
     })
-    //map.addLayer(buildingsGeoJSON);
-    drawShapesOnMap("./data/map.geojson",map)
+
+    drawShapesOnMap("./data/map.geojson", map);
+    var layers = map.getLayers();
+        layers.forEach(function(layer) {
+        console.log("main: ",layer.get('title'));
+    });
 }
