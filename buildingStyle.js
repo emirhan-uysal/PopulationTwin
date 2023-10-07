@@ -26,24 +26,30 @@ let populationRanges = [
     }
 ]
 
+function getColorByPopulation(population){
+    for(var i=0; i<populationRanges.length; i++){
+        if(population >= populationRanges[i].MinPop){
+            return populationRanges[i].Color;
+        }
+    }
+    return null
+}
+
 function drawShapesOnMap(path, map){
     fetch(path)
     .then(response => response.json())
     .then(data => {
-        for(var i=0; i<data.features.length; i++){
+        for(var i=0; i < data.features.length; i++){
             var population = data.features[i].properties.Population;
-            
+            var color = getColorByPopulation(population)
+
             var vectorSource = new ol.source.Vector({
                 features: new ol.format.GeoJSON().readFeatures(data.features[i])
             });
 
-            console.log(vectorSource);
-
             const vectorLayer = new ol.layer.Vector({
                 source: vectorSource
             });
-
-            console.log(vectorLayer);
 
             map.addLayer(vectorLayer);
         }
