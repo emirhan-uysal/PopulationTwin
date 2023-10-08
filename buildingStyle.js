@@ -78,8 +78,15 @@ function drawShapesOnMap(path, map){
             population = feature.getProperties().Population;
             style = getStyleByPopulation(population);
 
-            feature.setStyle(style);
-            vectorLayer.getSource().addFeatures([feature]);
+            let newFeature = new ol.Feature({
+                type: "Feature",
+                geometry: {type: "Polygon", coordinates: new ol.geom.Polygon([feature.getGeometry().getCoordinates()])},
+                Population: feature.getProperties().Population,
+                Name: feature.getProperties().Name,
+            });
+
+            newFeature.setStyle(style);
+            vectorLayer.getSource().addFeatures([newFeature]);
         });
         map.addLayer(vectorLayer);
     
@@ -95,4 +102,14 @@ function drawShapesOnMap(path, map){
         });
     })
     .catch(error => console.error('Error:', error));
+}
+
+function changeStyleByPopulation(features){
+    //var features = layer.getSource().getFeatures();
+    console.log(features);
+    features.forEach(feature => {
+        let population = feature.getProperties().Population;
+        let style = getStyleByPopulation(population);
+        feature.setStyle(style)
+    })
 }

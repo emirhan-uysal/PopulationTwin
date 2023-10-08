@@ -22,7 +22,7 @@ function init(){
         console.log(e.coordinate)
     });
 
-    const buildingsGeoJSON = new ol.layer.VectorImage({
+    let buildingsGeoJSON = new ol.layer.VectorImage({
         source: new ol.source.Vector({
             url: './data/map.geojson',
             format: new ol.format.GeoJSON()
@@ -33,10 +33,14 @@ function init(){
         title: 'buildingsGeoJSON',
     });
 
-    //map.addLayer(buildingsGeoJSON)
-    buildingsGeoJSON.setStyle(getStyleByPopulation(5000));
+    var features = buildingsGeoJSON.getSource().getFeatures();
+    console.log(buildingsGeoJSON);
+    changeStyleByPopulation(features);
+    map.addLayer(buildingsGeoJSON)
+    //buildingsGeoJSON.setStyle(getStyleByPopulation(100));
 
-    drawShapesOnMap("./data/map.geojson", map);
+    //drawShapesOnMap("./data/map.geojson", map);
+
     var layers = map.getLayers();
         layers.forEach(function(layer) {
         console.log("main: ",layer.get('title'));
