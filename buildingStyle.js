@@ -32,7 +32,7 @@ function getColorByPopulation(population){
             return populationRanges[i].Color;
         }
     }
-    return null
+    return null;
 }
 
 function getStyleByPopulation(population){
@@ -55,7 +55,7 @@ function getStyleByPopulation(population){
             font: textFont
         })
     });
-    return style
+    return style;
 }
 
 function drawShapesOnMap(path, map){
@@ -64,40 +64,34 @@ function drawShapesOnMap(path, map){
     .then(data => {
         const format = new ol.format.GeoJSON();
         const features = format.readFeatures(data)
-
-        let vectorSource = new ol.source.Vector();
         let style, population;
 
-        features.forEach((feature, index) => {
-            population = feature.getProperties().Population;
-            style = getStyleByPopulation(population);
-
-            feature.setStyle(style);
-            vectorSource.addFeatures([feature]);
-            let allFeatures = vectorSource.getFeatures();
-            allFeatures.forEach((f, i) => {
-                console.log("Index: ",index+"."+i,"\nPopulation: ",f.getProperties().Population ,"\nColor: ",f.getStyle().getFill().getColor())        
-            })
-        });
-        
         let vectorLayer = new ol.layer.Vector({
-            source: vectorSource,
+            source: new ol.source.Vector(),
             opacity: 0.8,
             visible: true,
             zIndex: 2,
             title: "VectorLayer"
         });
 
-        let f = vectorLayer.getSource().getFeatures();
-        f.forEach((a, b) => {
-            console.log(a.getProperties());
-        })
+        features.forEach((feature) => {
+            population = feature.getProperties().Population;
+            style = getStyleByPopulation(population);
 
+            feature.setStyle(style);
+            vectorLayer.getSource().addFeatures([feature]);
+        });
         map.addLayer(vectorLayer);
     
-        var layers = map.getLayers();
-            layers.forEach(function(layer) {
-            console.log("DSOM) ",layer.get('title'));
+        let layers = map.getLayers();
+            layers.forEach(function(layer, i) {
+                console.log("Layer "+ i + ": ",layer.get('title'));
+                if (layer.get('title') != "StandartLayer"){
+                    console.log("Features:");
+                    layer.getSource().getFeatures().forEach((f, i) => {
+                        console.log("Index: "+i,"\nFeature: ",f,"\nProperties: ",f.getProperties(),"\nPopulation: ",f.getProperties().Population ,"\nColor: ",f.getStyle().getFill().getColor(), "\nCoordinates: ", f.getGeometry().getCoordinates()) 
+                    });  
+                }
         });
     })
     .catch(error => console.error('Error:', error));

@@ -7,32 +7,34 @@ function init(){
             maxZoom: 20
         }),
         target: 'js-map'
-    })
+    });
 
     const standartLayer = new ol.layer.Tile({
         source: new ol.source.OSM(),
         visible: true,
         zIndex: 1,
         title: "StandartLayer"
-    })
+    });
 
-    map.addLayer(standartLayer)
+    map.addLayer(standartLayer);
 
     map.on('click',function(e){
         console.log(e.coordinate)
-    })
+    });
 
-    let style = getStyleByPopulation(1999)
     const buildingsGeoJSON = new ol.layer.VectorImage({
         source: new ol.source.Vector({
             url: './data/map.geojson',
             format: new ol.format.GeoJSON()
         }),
         opacity: 0.8,
-        style: style,
         visible: true,
+        zIndex: 1,
         title: 'buildingsGeoJSON',
-    })
+    });
+
+    //map.addLayer(buildingsGeoJSON)
+    buildingsGeoJSON.setStyle(getStyleByPopulation(5000));
 
     drawShapesOnMap("./data/map.geojson", map);
     var layers = map.getLayers();
